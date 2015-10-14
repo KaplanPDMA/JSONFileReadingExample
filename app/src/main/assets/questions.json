@@ -1,0 +1,25 @@
+{
+  "questions": [
+    {
+      "question": "this is a question",
+      "a": "answer",
+      "b": "option b1",
+      "c": "option c1",
+      "d": "option d1"
+    },
+    {
+      "question": "Question 2",
+      "a": "option a is always the answer",
+      "b": "option b2",
+      "c": "option c2",
+      "d": "option d2"
+    },
+    {
+      "question": "Question three",
+      "a": "correct option",
+      "b": "option b3",
+      "c": "option c3",
+      "d": "option d3"
+    }
+  ]
+}
