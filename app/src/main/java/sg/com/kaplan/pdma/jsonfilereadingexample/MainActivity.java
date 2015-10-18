@@ -2,7 +2,12 @@ package sg.com.kaplan.pdma.jsonfilereadingexample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,13 +19,19 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<Question> list;
+    ArrayList<Question> questions;
+
+    TextView textViewQuestion;
+    RadioButton[] radioButtons;
+    Question currentQuestion;
+    int selectedOption;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayList<Question> list = new ArrayList<Question>();
+        questions = new ArrayList<Question>();
 
         try {
             JSONObject jsonObject = new JSONObject(loadJSONFromAsset("questions.json"));
@@ -35,27 +46,88 @@ public class MainActivity extends AppCompatActivity {
                 options[3] = questionObject.getString("d");
 
                 Question q = new Question(question, options);
-                list.add(q);
+                questions.add(q);
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        String text = "";
-        for(int i = 0; i < list.size(); i++) {
-            Question q = list.get(i);
-            text += "Q" + (i+1) + ". " + q.getQuestion() + "\n";
-            String[] options = q.getOptions();
-            text += "\t" + "a. " + options[0] + "\n";
-            text += "\t" + "b. " + options[1] + "\n";
-            text += "\t" + "c. " + options[2] + "\n";
-            text += "\t" + "d. " + options[3] + "\n\n";
+        textViewQuestion = (TextView) findViewById(R.id.textViewQuestion);
 
+        RadioButton radioButton1 = (RadioButton) findViewById(R.id.radioButton1);
+        RadioButton radioButton2 = (RadioButton) findViewById(R.id.radioButton2);
+        RadioButton radioButton3 = (RadioButton) findViewById(R.id.radioButton3);
+        RadioButton radioButton4 = (RadioButton) findViewById(R.id.radioButton4);
+        radioButtons = new RadioButton[4];
+        radioButtons[0] = radioButton1;
+        radioButtons[1] = radioButton2;
+        radioButtons[2] = radioButton3;
+        radioButtons[3] = radioButton4;
+
+        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // checkedId is the RadioButton selected
+                switch (checkedId) {
+                    case R.id.radioButton1:
+                        selectedOption = 0;
+                        break;
+                    case R.id.radioButton2:
+                        selectedOption = 1;
+                        break;
+                    case R.id.radioButton3:
+                        selectedOption = 2;
+                        break;
+                    case R.id.radioButton4:
+                        selectedOption = 3;
+                        break;
+                }
+            }
+        });
+
+
+        Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(selectedOption == -1) {
+                    Toast.makeText(getApplicationContext(), "Please select an option first", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    Boolean isCorrect = false;
+                    if(selectedOption == currentQuestion.getCorrectOption()) {
+                        isCorrect = true;
+                    }
+
+                    if(isCorrect) {
+                        Toast.makeText(getApplicationContext(), "Correct", Toast.LENGTH_SHORT).show();
+                        //can move to the next question by questionNum++ and then displayQuestion()
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Incorrect ... please try again", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+
+        //start
+        int questionNum = 0;
+        displayQuestion(questionNum);
+    }
+
+    private void displayQuestion(int questionNum) {
+        currentQuestion = questions.get(questionNum);
+        textViewQuestion.setText(currentQuestion.getQuestion());
+        String[] optionsText = currentQuestion.getOptions();
+        //We can randomly set one particular option to be the correct option (to use correctOption)
+        //and then fill up the other options
+        currentQuestion.setCorrectOption(0); //the correct option is the first one.
+        for(int i = 0; i < 4; i++) {
+            radioButtons[i].setText(optionsText[i]);
         }
 
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(text);
+        selectedOption = -1;
     }
 
     //http://stackoverflow.com/questions/13814503/reading-a-json-file-in-android

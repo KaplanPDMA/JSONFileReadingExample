@@ -7,6 +7,7 @@ package sg.com.kaplan.pdma.jsonfilereadingexample;
 public class Question {
     String question;
     String[] options;
+    int correctOption;
 
     public Question(String question, String[] options) {
         this.question = question;
@@ -19,5 +20,13 @@ public class Question {
 
     public String[] getOptions() {
         return options;
+    }
+
+    public int getCorrectOption() {
+        return correctOption;
+    }
+
+    public void setCorrectOption(int correctOption) {
+        this.correctOption = correctOption;
     }
 }
